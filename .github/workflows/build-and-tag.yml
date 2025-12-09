@@ -92,6 +92,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=raw,value=${{ steps.extract-version.outputs.full_version }},enable=true
             type=raw,value=${{ steps.extract-version.outputs.major_version }},enable=${{ github.ref == 'refs/heads/main' }}
