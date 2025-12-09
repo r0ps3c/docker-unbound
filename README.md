@@ -30,7 +30,11 @@ nslookup google.com 127.0.0.1
 
 ## Image Tags
 
-- **`latest`** - Latest build from main branch
+- **`main`** - Latest build from main branch (same as `latest`)
+  - Updates: Automatically on every Unbound release
+  - Use for: Explicit main branch tracking
+
+- **`latest`** - Latest build from main branch (same as `main`)
   - Updates: Automatically on every Unbound release
   - Use for: Testing, development
 

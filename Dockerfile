@@ -4,8 +4,9 @@ RUN \
 	apk --no-cache add unbound bind-tools && \
 	rm -rf /var/cache/apk/* && \
 	# Unbound package creates unbound user/group automatically
-	# Ensure proper ownership
-	chown -R unbound:unbound /etc/unbound
+	# Create runtime directories and set ownership
+	mkdir -p /var/run/unbound && \
+	chown -R unbound:unbound /etc/unbound /var/run/unbound
 
 USER unbound
 EXPOSE 53 53/udp
