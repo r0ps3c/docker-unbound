@@ -1,0 +1,80 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "minimumReleaseAge": "2 days",
+  "packageRules": [
+    {
+      "description": "Alpine base image updates with 2-day stabilization",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["alpine"],
+      "enabled": true,
+      "minimumReleaseAge": "2 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "ignoreTests": false,
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "description": "Major Alpine updates require manual review",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["alpine"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "GitHub Actions updates with 2-day stabilization",
+      "matchManagers": ["github-actions"],
+      "minimumReleaseAge": "2 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "ignoreTests": false,
+      "pinDigests": true
+    },
+    {
+      "description": "APK packages - minor/patch auto-merge with 2-day stabilization",
+      "matchManagers": ["regex"],
+      "matchDatasources": ["repology"],
+      "minimumReleaseAge": "2 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "ignoreTests": false,
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["before 6am on monday"]
+    },
+    {
+      "description": "APK packages - major updates require manual review",
+      "matchManagers": ["regex"],
+      "matchDatasources": ["repology"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "schedule": ["before 6am on monday"]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track Unbound APK version in Dockerfile",
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "apk --no-cache add unbound(?:=(?<currentValue>[a-zA-Z0-9\\-._]+))?"
+      ],
+      "datasourceTemplate": "repology",
+      "depNameTemplate": "unbound",
+      "versioningTemplate": "loose",
+      "lookupNameTemplate": "alpine_3_19/unbound"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "timezone": "UTC",
+  "schedule": ["before 6am on monday"]
+}

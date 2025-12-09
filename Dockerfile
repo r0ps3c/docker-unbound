@@ -1,6 +1,17 @@
 FROM alpine
+
 RUN \
-	apk --no-cache add unbound && \
-	rm -rf /var/cache/apk/*
+	apk --no-cache add unbound bind-tools && \
+	rm -rf /var/cache/apk/* && \
+	# Unbound package creates unbound user/group automatically
+	# Ensure proper ownership
+	chown -R unbound:unbound /etc/unbound
+
+USER unbound
 EXPOSE 53 53/udp
+
+# Health check: verify Unbound is responding
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+	CMD nslookup -type=NS . 127.0.0.1 > /dev/null || exit 1
+
 ENTRYPOINT ["/usr/sbin/unbound", "-d"]

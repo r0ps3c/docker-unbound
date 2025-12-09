@@ -1,0 +1,123 @@
+name: Build and Tag
+
+on:
+  push:
+    branches:
+      - main
+      - stable
+  pull_request:
+    branches:
+      - main
+      - stable
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: make build
+
+      - name: Run structure tests
+        run: make test-structure
+
+      - name: Run standalone tests
+        run: make test-standalone
+
+      - name: Run integration tests
+        run: make test-integration
+
+      - name: Extract version information
+        id: extract-version
+        run: |
+          FULL_VERSION=$(docker run --rm --entrypoint sh unbound-network:main -c 'apk info unbound 2>/dev/null | grep "^unbound-" | head -1 | cut -d- -f2 | cut -dr -f1')
+          MAJOR_VERSION=$(echo "$FULL_VERSION" | cut -d. -f1)
+
+          echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
+          echo "major_version=$MAJOR_VERSION" >> $GITHUB_OUTPUT
+          echo "Unbound version: $FULL_VERSION (major: $MAJOR_VERSION)"
+
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check stable tag compatibility
+        id: check-stable
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          IMAGE_BASE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          MAIN_MAJOR="${{ steps.extract-version.outputs.major_version }}"
+
+          if docker pull "${IMAGE_BASE}:stable" 2>/dev/null; then
+            STABLE_VERSION=$(docker run --rm --entrypoint sh "${IMAGE_BASE}:stable" -c 'apk info unbound 2>/dev/null | grep "^unbound-" | head -1 | cut -d- -f2 | cut -dr -f1')
+            STABLE_MAJOR=$(echo "$STABLE_VERSION" | cut -d. -f1)
+
+            echo "Main major version: $MAIN_MAJOR"
+            echo "Stable major version: $STABLE_MAJOR"
+
+            if [ "$MAIN_MAJOR" == "$STABLE_MAJOR" ]; then
+              echo "safe_to_update=true" >> $GITHUB_OUTPUT
+              echo "✓ Safe to update stable tag (same major version)"
+            else
+              echo "safe_to_update=false" >> $GITHUB_OUTPUT
+              echo "✗ Not safe to update stable tag (major version changed: $STABLE_MAJOR -> $MAIN_MAJOR)"
+            fi
+          else
+            echo "safe_to_update=true" >> $GITHUB_OUTPUT
+            echo "✓ No existing stable tag, safe to create"
+          fi
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        if: github.event_name != 'pull_request'
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=${{ steps.extract-version.outputs.full_version }},enable=true
+            type=raw,value=${{ steps.extract-version.outputs.major_version }},enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=stable,enable=${{ github.ref == 'refs/heads/main' && steps.check-stable.outputs.safe_to_update == 'true' }}
+            type=raw,value=stable,enable=${{ github.ref == 'refs/heads/stable' }}
+
+      - name: Build and push Docker image
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Unbound Version:** ${{ steps.extract-version.outputs.full_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Major Version:** ${{ steps.extract-version.outputs.major_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tags Pushed" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
