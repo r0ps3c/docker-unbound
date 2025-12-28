@@ -43,16 +43,14 @@
       "automergeType": "pr",
       "automergeStrategy": "squash",
       "ignoreTests": false,
-      "matchUpdateTypes": ["minor", "patch"],
-      "schedule": ["before 6am on monday"]
+      "matchUpdateTypes": ["minor", "patch"]
     },
     {
       "description": "APK packages - major updates require manual review",
       "matchManagers": ["regex"],
       "matchDatasources": ["repology"],
       "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "schedule": ["before 6am on monday"]
+      "automerge": false
     }
   ],
   "customManagers": [
@@ -75,6 +73,5 @@
   "labels": ["dependencies"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
-  "timezone": "UTC",
-  "schedule": ["before 6am on monday"]
+  "timezone": "UTC"
 }
