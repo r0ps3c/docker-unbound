@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "dependencyDashboard": false,
   "minimumReleaseAge": "2 days",
   "packageRules": [
     {
@@ -50,7 +51,14 @@
       "matchManagers": ["regex"],
       "matchDatasources": ["repology"],
       "matchUpdateTypes": ["major"],
-      "automerge": false
+      "automerge": false,
+      "schedule": ["before 6am on monday"]
+    },
+    {
+      "description": "Handle aquasecurity/trivy-action inconsistent tag naming",
+      "matchDatasources": ["github-tags"],
+      "matchPackageNames": ["aquasecurity/trivy-action"],
+      "extractVersion": "^v?(?<version>.*)$"
     }
   ],
   "customManagers": [
