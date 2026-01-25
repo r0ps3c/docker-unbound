@@ -52,7 +52,6 @@
       "matchDatasources": ["repology"],
       "matchUpdateTypes": ["major"],
       "automerge": false,
-      "schedule": ["before 6am on monday"]
     },
     {
       "description": "Handle aquasecurity/trivy-action inconsistent tag naming",
