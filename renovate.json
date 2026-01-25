@@ -51,7 +51,7 @@
       "matchManagers": ["regex"],
       "matchDatasources": ["repology"],
       "matchUpdateTypes": ["major"],
-      "automerge": false,
+      "automerge": false
     },
     {
       "description": "Handle aquasecurity/trivy-action inconsistent tag naming",
