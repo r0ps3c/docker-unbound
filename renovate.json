@@ -23,7 +23,8 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["alpine"],
       "matchUpdateTypes": ["major"],
-      "automerge": false
+      "automerge": false,
+      "reviewers": ["r0ps3c"]
     },
     {
       "description": "GitHub Actions updates with 2-day stabilization",
@@ -51,7 +52,8 @@
       "matchManagers": ["regex"],
       "matchDatasources": ["repology"],
       "matchUpdateTypes": ["major"],
-      "automerge": false
+      "automerge": false,
+      "reviewers": ["r0ps3c"]
     }
   ],
   "customManagers": [
