@@ -1,7 +1,7 @@
 FROM alpine:3.23
 
 RUN \
-	apk --no-cache add unbound bind-tools && \
+	apk --no-cache add unbound=1.24.2-r0 bind-tools && \
 	rm -rf /var/cache/apk/* && \
 	# Unbound package creates unbound user/group automatically
 	# Create runtime directories and set ownership
