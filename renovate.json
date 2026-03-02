@@ -59,15 +59,15 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Track Unbound APK version in Dockerfile",
+      "description": "Track Unbound APK version in Dockerfile, keyed to the actual Alpine version in use",
       "fileMatch": ["^Dockerfile$"],
       "matchStrings": [
-        "apk --no-cache add unbound(?:=(?<currentValue>[a-zA-Z0-9\\-._]+))?"
+        "FROM alpine:(?<alpineMajor>[0-9]+)\\.(?<alpineMinor>[0-9]+)[\\s\\S]*?apk[^\\n]*unbound=(?<currentValue>[0-9][0-9.]*)-r[0-9]+"
       ],
       "datasourceTemplate": "repology",
       "depNameTemplate": "unbound",
       "versioningTemplate": "loose",
-      "lookupNameTemplate": "alpine_3_19/unbound"
+      "lookupNameTemplate": "alpine_{{alpineMajor}}_{{alpineMinor}}/unbound"
     }
   ],
   "vulnerabilityAlerts": {
