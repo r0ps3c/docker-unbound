@@ -15,7 +15,7 @@ on:
 
 jobs:
   build-scan-push:
-    uses: r0ps3c/gh-shared-workflows/.github/workflows/docker-build-scan-push.yml@c6ef69d22ab5c31b04437b8c5ee27be005df3d3c # main
+    uses: r0ps3c/gh-shared-workflows/.github/workflows/docker-build-scan-push.yml@3b54e37739538a4d9b73adc6e0f4f9212db36c23 # main
     with:
       image-ref: unbound-network:main
       version-extract-command: "apk info unbound 2>/dev/null | grep '^unbound-' | head -1 | cut -d- -f2 | cut -dr -f1"
