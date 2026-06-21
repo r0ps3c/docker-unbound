@@ -1,4 +1,4 @@
-FROM alpine:3.23
+FROM alpine:3.24
 
 RUN \
 	apk --no-cache add unbound=1.24.2-r0 bind-tools && \
