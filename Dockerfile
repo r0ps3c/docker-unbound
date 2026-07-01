@@ -1,7 +1,7 @@
-FROM alpine:3.23
+FROM alpine:3.24
 
 RUN \
-	apk --no-cache add unbound=1.24.2-r0 bind-tools && \
+	apk --no-cache add unbound=1.25.1-r0 bind-tools && \
 	apk upgrade --no-cache && \
 	rm -rf /var/cache/apk/* && \
 	# Unbound package creates unbound user/group automatically
