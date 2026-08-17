@@ -38,10 +38,10 @@
       "pinDigests": true
     },
     {
-      "description": "APK packages - minor/patch auto-merge with 2-day stabilization",
+      "description": "APK packages - minor/patch auto-merge with 1-day stabilization (shorter than other datasources because Alpine's apk repo prunes superseded package builds immediately, so a longer wait just means more time with a broken pin rather than a safe fallback)",
       "matchManagers": ["regex"],
       "matchDatasources": ["repology"],
-      "minimumReleaseAge": "2 days",
+      "minimumReleaseAge": "1 day",
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
