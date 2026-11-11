@@ -36,39 +36,6 @@
       "automergeStrategy": "squash",
       "ignoreTests": false,
       "pinDigests": true
-    },
-    {
-      "description": "APK packages - minor/patch auto-merge with 1-day stabilization (shorter than other datasources because Alpine's apk repo prunes superseded package builds immediately, so a longer wait just means more time with a broken pin rather than a safe fallback)",
-      "matchManagers": ["regex"],
-      "matchDatasources": ["repology"],
-      "minimumReleaseAge": "1 day",
-      "automerge": true,
-      "automergeType": "pr",
-      "automergeStrategy": "squash",
-      "ignoreTests": false,
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
-      "description": "APK packages - major updates require manual review",
-      "matchManagers": ["regex"],
-      "matchDatasources": ["repology"],
-      "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "reviewers": ["r0ps3c"]
-    }
-  ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Track Unbound APK version in Dockerfile, keyed to the actual Alpine version in use",
-      "fileMatch": ["^Dockerfile$"],
-      "matchStrings": [
-        "FROM alpine:(?<alpineMajor>[0-9]+)\\.(?<alpineMinor>[0-9]+)[\\s\\S]*?apk[^\\n]*unbound=(?<currentValue>[0-9][0-9.]*)-r[0-9]+"
-      ],
-      "datasourceTemplate": "repology",
-      "depNameTemplate": "unbound",
-      "versioningTemplate": "loose",
-      "lookupNameTemplate": "alpine_{{alpineMajor}}_{{alpineMinor}}/unbound"
     }
   ],
   "vulnerabilityAlerts": {

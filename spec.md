@@ -75,9 +75,8 @@ Version extraction: `apk info unbound 2>/dev/null | grep "^unbound-" | head -1 |
 |---|---|---|---|
 | Alpine base image | docker | Auto-merge (squash, 2-day wait, tests required, digest-pinned) | Manual review; reviewer: `r0ps3c` |
 | GitHub Actions | github-actions | Auto-merge (squash, 2-day wait, pin digests) | Manual review |
-| Unbound APK | regex / repology (`alpine_{{major}}_{{minor}}/unbound`) | Auto-merge (squash, 2-day wait) | Manual review; reviewer: `r0ps3c` |
 
-Custom regex manager tracks Unbound version in `Dockerfile` via a multiline pattern that captures the Alpine version from the `FROM` line and the unbound version from the `apk add` line. The `lookupNameTemplate` is constructed dynamically (`alpine_{{alpineMajor}}_{{alpineMinor}}/unbound`), so it stays in sync with the pinned Alpine version automatically when Renovate bumps it. The regex captures only the upstream version (e.g. `1.24.2`), excluding the Alpine revision suffix (`-r0`), so repology version comparisons work correctly.
+The Unbound APK package is not pinned to an exact revision (`unbound~=1.25` in the `Dockerfile`), so it is not tracked by Renovate; patch revisions are picked up on each build and by `apk upgrade`. Minor/major Unbound changes arrive with a new Alpine base image.
 
 ## CI/CD
 
